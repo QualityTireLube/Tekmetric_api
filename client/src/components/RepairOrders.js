@@ -147,6 +147,10 @@ function RepairOrders() {
     setError(null);
     setSuccess(null);
     try {
+      console.log('=== Starting RO Update ===');
+      console.log('Current formData:', formData);
+      console.log('Selected RO label:', selectedRO.repairOrderLabel);
+      
       // Check if repair order is active
       const inactiveStatuses = ['COMPLETE', 'INVOICED', 'CLOSED', 'CANCELLED'];
       if (selectedRO.repairOrderStatus && inactiveStatuses.includes(selectedRO.repairOrderStatus.code)) {
@@ -160,45 +164,51 @@ function RepairOrders() {
       // Only include changed fields
       if (formData.keyTag !== (selectedRO.keytag || '')) {
         updateData.keyTag = formData.keyTag || null;
+        console.log('KeyTag changed');
       }
       
       if (formData.milesIn && formData.milesIn !== (selectedRO.milesIn || '')) {
         updateData.milesIn = parseInt(formData.milesIn) || null;
+        console.log('MilesIn changed');
       }
       
       if (formData.milesOut && formData.milesOut !== (selectedRO.milesOut || '')) {
         updateData.milesOut = parseInt(formData.milesOut) || null;
+        console.log('MilesOut changed');
       }
       
       if (formData.technicianId && formData.technicianId !== (selectedRO.technicianId || '')) {
         updateData.technicianId = parseInt(formData.technicianId) || null;
+        console.log('TechnicianId changed');
       }
       
       if (formData.serviceWriterId && formData.serviceWriterId !== (selectedRO.serviceWriterId || '')) {
         updateData.serviceWriterId = parseInt(formData.serviceWriterId) || null;
+        console.log('ServiceWriterId changed');
       }
       
       if (formData.customerTimeOut) {
         const isoDate = new Date(formData.customerTimeOut).toISOString();
         if (isoDate !== selectedRO.customerTimeOut) {
           updateData.customerTimeOut = isoDate;
+          console.log('CustomerTimeOut changed');
         }
       }
       
-      if (formData.repairOrderLabelId && formData.repairOrderLabelId !== (selectedRO.repairOrderLabel?.id?.toString() || '')) {
-        updateData.repairOrderLabelId = parseInt(formData.repairOrderLabelId);
-        console.log(`Updating label from ${selectedRO.repairOrderLabel?.id} to ${formData.repairOrderLabelId}`);
-      }
+      // Note: repairOrderLabelId is NOT supported by the Tekmetric API for updates
+      // Labels can only be changed directly in Tekmetric
       
       // Check if there are any changes
+      console.log('Update data to send:', updateData);
       if (Object.keys(updateData).length === 0) {
         setError('No changes detected');
         setLoading(false);
         return;
       }
       
-      console.log('Sending update data:', updateData);
-      await updateRepairOrder(selectedRO.id, updateData);
+      console.log('Sending PATCH request with data:', updateData);
+      const updateResponse = await updateRepairOrder(selectedRO.id, updateData);
+      console.log('Update response received:', updateResponse);
       setSuccess('Repair Order updated successfully!');
       setEditMode(false);
       loadRepairOrders(searchTerm, statusFilter, labelFilter);
@@ -206,11 +216,14 @@ function RepairOrders() {
       // Refresh the selected RO data
       const response = await getRepairOrder(selectedRO.id);
       setSelectedRO(response.data);
+      console.log('Refreshed RO label:', response.data.repairOrderLabel);
       
       setTimeout(() => {
         setSuccess(null);
       }, 3000);
     } catch (err) {
+      console.error('Update error:', err);
+      console.error('Error response:', err.response);
       setError(err.response?.data?.error?.message || err.message);
     } finally {
       setLoading(false);
@@ -452,29 +465,18 @@ function RepairOrders() {
                     />
                   </div>
                   <div className="form-group">
-                    <label>Label {editMode && '*'}</label>
-                    {editMode ? (
-                      <select
-                        name="repairOrderLabelId"
-                        value={formData.repairOrderLabelId}
-                        onChange={handleChange}
-                      >
-                        <option value="">Select Label...</option>
-                        <option value="1">Work Not Started</option>
-                        <option value="2">Waiting for Parts</option>
-                        <option value="3">Waiting for Authorization</option>
-                        <option value="4">In Progress</option>
-                        <option value="5">Quality Control</option>
-                        <option value="6">Ready for Pickup</option>
-                        <option value="7">Completed</option>
-                      </select>
-                    ) : (
-                      <input
-                        type="text"
-                        value={selectedRO.repairOrderLabel?.name || 'N/A'}
-                        disabled
-                        style={{ backgroundColor: '#e5e7eb', cursor: 'not-allowed' }}
-                      />
+                    <label>Label</label>
+                    <input
+                      type="text"
+                      value={selectedRO.repairOrderLabel?.name || 'N/A'}
+                      disabled
+                      style={{ backgroundColor: '#e5e7eb', cursor: 'not-allowed' }}
+                      title="Label cannot be updated via API. Must be changed in Tekmetric directly."
+                    />
+                    {editMode && (
+                      <small style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '0.25rem', display: 'block' }}>
+                        Note: Labels can only be changed in Tekmetric directly
+                      </small>
                     )}
                   </div>
                 </div>
