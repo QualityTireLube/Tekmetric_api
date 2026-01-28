@@ -95,12 +95,13 @@ function RepairOrders() {
         technicianId: fullRO.technicianId || '',
         serviceWriterId: fullRO.serviceWriterId || '',
         customerTimeOut: fullRO.customerTimeOut ? fullRO.customerTimeOut.substring(0, 16) : '',
-        repairOrderLabelId: fullRO.repairOrderLabel?.id || '',
+        repairOrderLabelId: fullRO.repairOrderLabel?.id?.toString() || '',
         customerId: fullRO.customerId || '',
         vehicleId: fullRO.vehicleId || '',
         appointmentStartTime: fullRO.appointmentStartTime ? fullRO.appointmentStartTime.substring(0, 16) : '',
         notes: '', // Can be used for internal notes
       });
+      console.log('Loaded RO with label:', fullRO.repairOrderLabel);
       setShowModal(true);
       setEditMode(false);
       setError(null);
@@ -184,8 +185,9 @@ function RepairOrders() {
         }
       }
       
-      if (formData.repairOrderLabelId && formData.repairOrderLabelId !== (selectedRO.repairOrderLabel?.id || '')) {
+      if (formData.repairOrderLabelId && formData.repairOrderLabelId !== (selectedRO.repairOrderLabel?.id?.toString() || '')) {
         updateData.repairOrderLabelId = parseInt(formData.repairOrderLabelId);
+        console.log(`Updating label from ${selectedRO.repairOrderLabel?.id} to ${formData.repairOrderLabelId}`);
       }
       
       // Check if there are any changes
@@ -195,6 +197,7 @@ function RepairOrders() {
         return;
       }
       
+      console.log('Sending update data:', updateData);
       await updateRepairOrder(selectedRO.id, updateData);
       setSuccess('Repair Order updated successfully!');
       setEditMode(false);
