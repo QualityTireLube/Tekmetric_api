@@ -278,7 +278,8 @@ router.get('/inspections/:inspectionId', async (req, res, next) => {
 // ===== Employee Routes =====
 router.get('/employees', async (req, res, next) => {
   try {
-    const data = await tekmetricService.getEmployees();
+    console.log('📋 Employees endpoint called with query params:', req.query);
+    const data = await tekmetricService.getEmployees(req.query);
     res.json(data);
   } catch (error) {
     next(error);

@@ -33,6 +33,12 @@ api.interceptors.response.use(
 // ===== Auth =====
 export const testAuth = () => api.get('/auth/test');
 export const getAuthStatus = () => api.get('/auth/status');
+export const updateCredentials = (credentials) => api.post('/auth/update-credentials', credentials);
+export const getCredentials = () => api.get('/auth/credentials');
+export const saveCredentialSet = (data) => api.post('/auth/credentials/save', data);
+export const getSavedCredentials = () => api.get('/auth/credentials/list');
+export const switchCredentialSet = (id) => api.post('/auth/credentials/switch', { id });
+export const deleteCredentialSet = (id) => api.delete(`/auth/credentials/${id}`);
 
 // ===== Shops =====
 export const getShops = () => api.get('/tekmetric/shops');
@@ -72,7 +78,7 @@ export const getInspections = (params) => api.get('/tekmetric/inspections', { pa
 export const getInspection = (inspectionId) => api.get(`/tekmetric/inspections/${inspectionId}`);
 
 // ===== Employees =====
-export const getEmployees = () => api.get('/tekmetric/employees');
+export const getEmployees = (params) => api.get('/tekmetric/employees', { params });
 export const getEmployee = (employeeId) => api.get(`/tekmetric/employees/${employeeId}`);
 
 // ===== Appointments =====

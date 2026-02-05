@@ -10,6 +10,7 @@ import Appointments from './components/Appointments';
 import Inventory from './components/Inventory';
 import Inspections from './components/Inspections';
 import Employees from './components/Employees';
+import Settings from './components/Settings';
 import { getAuthStatus } from './services/api';
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
             <Link to="/inventory">Inventory</Link>
             <Link to="/inspections">Inspections</Link>
             <Link to="/employees">Employees</Link>
+            <Link to="/settings">Settings</Link>
           </div>
           <div className="nav-status">
             <span className={`status-badge ${authStatus?.configured ? 'success' : 'error'}`}>
@@ -76,6 +78,7 @@ function App() {
             <Route path="/inventory" element={<Inventory />} />
             <Route path="/inspections" element={<Inspections />} />
             <Route path="/employees" element={<Employees />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
         </div>
       </div>

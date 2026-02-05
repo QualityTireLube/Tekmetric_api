@@ -116,8 +116,12 @@ npm run client
    - **Customers**: View and create customers
    - **Vehicles**: View and create vehicles
    - **Repair Orders**: View all repair orders
+   - **Jobs**: View and manage jobs
+   - **Appointments**: View, create, and manage appointments
+   - **Inventory**: View inventory parts
    - **Inspections**: View inspections
    - **Employees**: View employee list
+   - **Settings**: Manage environment and clear cache
 
 ## API Endpoints
 
@@ -255,9 +259,55 @@ MIT
 
 For Tekmetric API documentation and support, visit [Tekmetric's developer portal](https://tekmetric.com).
 
+## Switching Between Sandbox and Live
+
+### 🎉 New: Dynamic Credential Updates!
+
+You can now update credentials directly from the Settings page without restarting the server:
+
+1. Go to **Settings** page: `http://localhost:3000/settings`
+2. Click **"🔧 Update Credentials"**
+3. Enter your new credentials
+4. Click **"💾 Save Credentials"**
+5. Refresh the page
+
+**No server restart needed!** Changes take effect immediately.
+
+### Traditional Method (Still Available)
+
+When switching between sandbox and live environments manually:
+
+1. Update your `.env` file with the new credentials
+2. Restart the backend server
+3. Go to the **Settings** page (`/settings`)
+4. Click **"Clear All Cache"**
+5. Refresh the page
+
+For detailed instructions, see:
+- [DYNAMIC_CREDENTIALS.md](./DYNAMIC_CREDENTIALS.md) - Dynamic updates guide
+- [SWITCHING_ENVIRONMENTS.md](./SWITCHING_ENVIRONMENTS.md) - Complete switching guide
+
+### Quick Cache Clear
+
+```bash
+# Clear server cache via command line
+npm run clear-cache
+```
+
+## Cache Management
+
+The application caches data in two places:
+
+- **Browser**: Shop IDs and settings in localStorage
+- **Server**: OAuth tokens in memory
+
+Use the Settings page to clear all cached data when switching environments.
+
+For more details, see [CACHE_MANAGEMENT.md](./CACHE_MANAGEMENT.md)
+
 ## Notes
 
 - This application is currently configured for the Tekmetric **sandbox** environment
-- To use in production, update `TEKMETRIC_ENVIRONMENT` to your production domain
+- To use in production, update `TEKMETRIC_ENVIRONMENT` to your production domain and **clear all cache**
 - Some API endpoints may require additional parameters based on Tekmetric's API specifications
 - The actual API response structure may vary - adjust the frontend components as needed based on real API responses

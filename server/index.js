@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit');
 
 const tekmetricRoutes = require('./routes/tekmetric');
 const authRoutes = require('./routes/auth');
+const tekmetricService = require('./services/tekmetricService');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -63,6 +64,6 @@ app.use((req, res) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📡 Environment: ${process.env.TEKMETRIC_ENVIRONMENT}`);
+  console.log(`📡 Active Environment: ${tekmetricService.environment}`);
   console.log(`🔗 Health check: http://localhost:${PORT}/health`);
 });

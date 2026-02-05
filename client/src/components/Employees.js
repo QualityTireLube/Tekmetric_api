@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getEmployees, getEmployee } from '../services/api';
+import { getEmployees, getEmployee, getShops } from '../services/api';
 
 function Employees() {
   const [employees, setEmployees] = useState([]);
@@ -9,31 +9,73 @@ function Employees() {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [shops, setShops] = useState([]);
+  const [selectedShop, setSelectedShop] = useState(null);
 
-  useEffect(() => {
-    loadEmployees();
-  }, []);
+  const loadShops = async () => {
+    try {
+      const response = await getShops();
+      const shopsData = Array.isArray(response.data) ? response.data : response.data.content || [];
+      setShops(shopsData);
+      
+      // Auto-select first shop if available
+      if (shopsData.length > 0) {
+        setSelectedShop(shopsData[0].id);
+      }
+    } catch (err) {
+      console.error('Error loading shops:', err);
+      setError('Failed to load shops. Please check your API credentials.');
+    }
+  };
 
   const loadEmployees = async (searchQuery = '') => {
+    if (!selectedShop) {
+      setError('Please select a shop first');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      const params = { size: 100 };
+      const params = { 
+        shop: selectedShop,
+        size: 100 
+      };
       
       if (searchQuery.trim()) {
         params.search = searchQuery;
       }
       
+      console.log('Fetching employees with params:', params);
       const response = await getEmployees(params);
       const empData = Array.isArray(response.data) ? response.data : response.data.content || [];
       setEmployees(empData);
       setFilteredEmployees(empData);
     } catch (err) {
-      setError(err.response?.data?.error?.message || err.message);
+      const errorMsg = err.response?.data?.message || err.message;
+      setError(errorMsg);
+      
+      // Log detailed error for debugging
+      console.error('Error loading employees:', {
+        status: err.response?.status,
+        message: errorMsg,
+        details: err.response?.data
+      });
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadShops();
+  }, []);
+
+  useEffect(() => {
+    if (selectedShop) {
+      loadEmployees();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedShop]);
 
   const handleSearch = (e) => {
     const term = e.target.value;
@@ -73,9 +115,27 @@ function Employees() {
       <div className="card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <h2>Employees</h2>
-          <button className="btn btn-secondary" onClick={() => loadEmployees(searchTerm)}>
+          <button className="btn btn-secondary" onClick={() => loadEmployees(searchTerm)} disabled={!selectedShop}>
             Refresh
           </button>
+        </div>
+
+        {/* Shop Selector */}
+        <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+          <label>Select Shop</label>
+          <select
+            value={selectedShop || ''}
+            onChange={(e) => setSelectedShop(e.target.value)}
+            className="form-control"
+            disabled={shops.length === 0}
+          >
+            <option value="">-- Select a Shop --</option>
+            {shops.map((shop) => (
+              <option key={shop.id} value={shop.id}>
+                {shop.name} (ID: {shop.id})
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Search Bar */}
@@ -86,6 +146,7 @@ function Employees() {
             placeholder="Search employees by name..."
             value={searchTerm}
             onChange={handleSearch}
+            disabled={!selectedShop}
           />
           {searchTerm && (
             <button 
@@ -103,9 +164,15 @@ function Employees() {
         {error && !showModal && (
           <div className="alert alert-error" style={{ marginTop: '1rem' }}>
             <strong>Error:</strong> {error}
-            {error.includes('403') || error.includes('Access Denied') || error.includes('not found') ? (
+            {error.includes('403') || error.includes('Access Denied') || error.includes('Forbidden') ? (
               <div style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
-                <em>Note: The employees endpoint may require additional API permissions or may not be available in your sandbox environment.</em>
+                <strong>Possible Solutions:</strong>
+                <ul style={{ marginTop: '0.5rem', marginLeft: '1.5rem' }}>
+                  <li>The employees endpoint may require additional API permissions</li>
+                  <li>This endpoint may not be available in your sandbox environment</li>
+                  <li>Contact Tekmetric support to enable employee access for your API credentials</li>
+                  <li>Verify that your API credentials have the correct scopes/permissions</li>
+                </ul>
               </div>
             ) : null}
           </div>

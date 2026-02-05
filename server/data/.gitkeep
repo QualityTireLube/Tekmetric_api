@@ -1,0 +1,2 @@
+# This file ensures the data directory exists in the repository
+# The credentials.json file is excluded via .gitignore for security
