@@ -6,11 +6,15 @@ import Customers from './components/Customers';
 import Vehicles from './components/Vehicles';
 import RepairOrders from './components/RepairOrders';
 import Jobs from './components/Jobs';
+import Reports from './components/Reports';
+import WeeklyReport from './components/WeeklyReport';
 import Appointments from './components/Appointments';
 import Inventory from './components/Inventory';
 import Inspections from './components/Inspections';
 import Employees from './components/Employees';
 import Settings from './components/Settings';
+import VinSearch from './components/VinSearch';
+import DeclinedServices from './components/DeclinedServices';
 import { getAuthStatus } from './services/api';
 
 function App() {
@@ -52,7 +56,11 @@ function App() {
             <Link to="/customers">Customers</Link>
             <Link to="/vehicles">Vehicles</Link>
             <Link to="/repair-orders">Repair Orders</Link>
+            <Link to="/vin-search">VIN Search</Link>
+            <Link to="/declined-services">Declined Services</Link>
             <Link to="/jobs">Jobs</Link>
+            <Link to="/reports">Reports</Link>
+            <Link to="/weekly-report">Weekly Report</Link>
             <Link to="/appointments">Appointments</Link>
             <Link to="/inventory">Inventory</Link>
             <Link to="/inspections">Inspections</Link>
@@ -73,7 +81,11 @@ function App() {
             <Route path="/customers" element={<Customers />} />
             <Route path="/vehicles" element={<Vehicles />} />
             <Route path="/repair-orders" element={<RepairOrders />} />
+            <Route path="/vin-search" element={<VinSearch />} />
+            <Route path="/declined-services" element={<DeclinedServices />} />
             <Route path="/jobs" element={<Jobs />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/weekly-report" element={<WeeklyReport />} />
             <Route path="/appointments" element={<Appointments />} />
             <Route path="/inventory" element={<Inventory />} />
             <Route path="/inspections" element={<Inspections />} />
